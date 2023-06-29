@@ -1,3 +1,4 @@
+from ast import Return
 import PySimpleGUI as pg
 import json
 from datetime import date
@@ -40,8 +41,9 @@ layout = [
            pg.Text('', key='file')],
 
 	      [pg.Button('Começar'),
-           pg.Text('' , key='progress')]
+           pg.Button('Visualizar', key='view')],
 
+          [pg.Image(key='image', expand_x=True, expand_y=True)]
          ]
 
 
@@ -60,6 +62,69 @@ path3 = dir_path + '/Serra Gaucha/'
 for f in os.listdir(path3):
     os.remove(os.path.join(path3,f))
 
+def getCourse(values):
+    if values['graduacao']: TypeCourse = 1
+    if values['pos']: TypeCourse = 2
+    if values['tecnico']: TypeCourse = 3
+    if values['prof']: TypeCourse = 4
+
+    return TypeCourse
+
+def getDirectory(TypeCourse):
+
+    if TypeCourse == 1:
+        
+        dir = dir_path + '/Enderecos/'
+        return dir
+
+    if TypeCourse == 2:
+        
+        dir = dir_path + '/Enderecos/POS/'
+        return dir
+
+    if TypeCourse == 3:
+       
+        dir = dir_path + '/Enderecos/' 
+        return dir
+
+    if TypeCourse == 4:
+        
+        dir = dir_path + '/Enderecos/'
+        return dir
+    
+def getNameCourse(TypeCourse):
+    if TypeCourse == 1:
+
+        return 'Graduacao'
+
+    if TypeCourse == 2:
+
+        return 'Pos Graduacao'
+
+    if TypeCourse == 3:
+
+        return 'Tecnico'
+
+    if TypeCourse == 4:
+
+        return 'Profissionalizante'
+
+def getPosttype(values):
+    if values['post']: TypePost = 1
+    if values['stories']: TypePost = 2
+
+    return TypePost
+
+def view(Directory):
+    layout = [[pg.Image(Directory, key="new", expand_x=True, expand_y=True)]]
+    window = pg.Window("Second Window", layout, modal=True)
+    choice = None
+    while True:
+        event, values = window.read()
+        if event == "Exit" or event == pg.WIN_CLOSED:
+            break
+
+
 
 while True:
     event,values = window.read()
@@ -68,48 +133,22 @@ while True:
         window['file'].update(values['input'])
 
     if event == 'Começar':
-        
         path = values['input']
         im1 = Image.open(path)
 
-        if values['graduacao']: TypeCourse = 1
-        if values['pos']: TypeCourse = 2
-        if values['tecnico']: TypeCourse = 3
-        if values['prof']: TypeCourse = 4
-
-        if values['post']: TypePost = 1
-        if values['stories']: TypePost = 2
-
-
-        if TypePost == 1:
+        dir = getDirectory(getCourse(values))
+        curso = getNameCourse(getCourse(values))
+        
+        if getPosttype(values) == 1:
             y = 4186
             original = (1200,1200)
             im1 = im1.resize((5001,5001))
 
-        if TypePost == 2:
+        if getPosttype(values) == 2:
             y = 7000
             original = (1080,1920)
             im1 = im1.resize((5016,8918))
 
-        if TypeCourse == 1:
-            curso = 'Graduacao'
-            dir = dir_path + '/colors/'
-
-        if TypeCourse == 2:
-            curso = 'Pos Graduacao'
-            dir = dir_path + '/colors/POS/'
-
-        if TypeCourse == 3:
-            curso = 'Tecnico'
-            dir = dir_path + '/colors/'
-
-        if TypeCourse == 4:
-            curso = 'Profissionalizante'
-            dir = dir_path + '/colors/'
-
-        progress = str(i) + ' de 38'
-        window['progress'].update(progress)
-        
         while i <= 11:        
             directory1 = dir + str(i) + '.png'
             directory2 = dir_path + '/Centro Sul/' + (data["Polos"][n]) + ' - ' + str(date.today()) + ' - ' + curso + '.png'
@@ -143,6 +182,35 @@ while True:
             copied.save(directory2 , quality=95)
             i+=1
             n+=1
+    
+    if event == 'view':
+        
+        path = values['input']
+        im1 = Image.open(path)
+
+        dir = getDirectory(getCourse(values))
+        curso = getNameCourse(getCourse(values))
+        
+        if getPosttype(values) == 1:
+            y = 4186
+            original = (500,500)
+            im1 = im1.resize((5001,5001))
+
+        if getPosttype(values) == 2:
+            y = 7000
+            original = (501,891)
+            im1 = im1.resize((5016,8918))
+
+        directory1 = dir + '1.png'
+        directory2 = dir_path + '/Centro Sul/View.png'
+        im2 = Image.open(directory1)
+        copied = im1.copy()
+        copied.paste(im2,(5,y))
+        copied = copied.resize(original)
+        copied.save(directory2 , quality=95)
+
+        view(directory2)
+
 
     if event == pg.WINDOW_CLOSED:
         break
