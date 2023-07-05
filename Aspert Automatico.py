@@ -1,9 +1,12 @@
 from ast import Return
+from tkinter import font
 import PySimpleGUI as pg
 import json
 from datetime import date
 from PIL import Image
 import os
+
+#Variable Assignment
 
 TypeCourse = 1
 TypePost = 1
@@ -20,30 +23,35 @@ curso = ''
 i = 1
 n = 0
 
-pg.theme('DarkAmber')
+post = 4186
+stories = 7000
+
+pg.theme('LightGray1')
 
 path = ''
 layout = [
-          [pg.Text('Aspert Automático', font='Helvetica 38 bold')],
-          [pg.Text('Tipo de Promocional')],
+          [pg.Text('Aspert Automático', font=("Neo Sans Pro Ultra", 38, "bold"))],
+          [pg.Text('TIPO DE PROMOCIONAL', font=("Neo Sans Pro Medium", 12, "bold"), text_color = "#00aea9")],
 
-          [pg.Radio('Graduação', "CURSOS", default = True, key='graduacao'),
-	       pg.Radio('Pós-Graduação', "CURSOS", key='pos'),
-	       pg.Radio('Técnico', "CURSOS", key='tecnico'),
-	       pg.Radio('Profissionalizante', "CURSOS", key='prof')],
+          [pg.Radio('Graduação', "CURSOS", default = True, key='graduacao',  font=("Neo Sans Pro", 12)),
+	       pg.Radio('Pós-Graduação', "CURSOS", key='pos', font=("Neo Sans Pro", 12)),
+	       pg.Radio('Técnico', "CURSOS", key='tecnico', font=("Neo Sans Pro", 12)),
+	       pg.Radio('Profissionalizante', "CURSOS", key='prof', font=("Neo Sans Pro", 12))],
 	       
-          [pg.Text('Formato do Promocional')],
+          [pg.Text('FORMATO DO PROMOCIONAL', font=("Neo Sans Pro Medium", 12, "bold"), text_color = "#00aea9")],
 
-          [pg.Radio('Post', "FORMATO", default = True, key='post'),
-	       pg.Radio('Stories', "FORMATO", key='stories')],
+          [pg.Radio('Post', "FORMATO", default = True, key='post', font=("Neo Sans Pro", 12)),
+	       pg.Radio('Stories', "FORMATO", key='stories', font=("Neo Sans Pro", 12))],
 	       
 	      [pg.FileBrowse('Procurar Arquivo', key='input'),
            pg.Text('', key='file')],
 
 	      [pg.Button('Começar'),
-           pg.Button('Visualizar', key='view')],
+           pg.Button('Visualizar', key='view'),
+           pg.Push(),
+           pg.Image('Logos.png', expand_x=True, expand_y=True)]
+           
 
-          [pg.Image(key='image', expand_x=True, expand_y=True)]
          ]
 
 
@@ -116,7 +124,9 @@ def getPosttype(values):
     return TypePost
 
 def view(Directory):
-    layout = [[pg.Image(Directory, key="new", expand_x=True, expand_y=True)]]
+    layout = [[pg.Image(Directory, key="new", expand_x=True, expand_y=True)],
+              [pg.Button('↑', key='up'),
+               pg.Button('↓', key='down')]]
     window = pg.Window("Second Window", layout, modal=True)
     choice = None
     while True:
@@ -140,12 +150,12 @@ while True:
         curso = getNameCourse(getCourse(values))
         
         if getPosttype(values) == 1:
-            y = 4186
+            y = post
             original = (1200,1200)
             im1 = im1.resize((5001,5001))
 
         if getPosttype(values) == 2:
-            y = 7000
+            y = stories
             original = (1080,1920)
             im1 = im1.resize((5016,8918))
 
@@ -172,7 +182,7 @@ while True:
             i+=1
             n+=1
 
-        while i > 25 <= 38:
+        while i > 25 and i <= 38:
             directory1 = dir + str(i) + '.png'
             directory2 = dir_path + '/Serra Gaucha/' + (data["Polos"][n]) + ' - ' + str(date.today()) + ' - ' + curso + '.png'
             im2 = Image.open(directory1)
@@ -182,26 +192,31 @@ while True:
             copied.save(directory2 , quality=95)
             i+=1
             n+=1
-    
+
+        
+    if i == 38:
+        i = 0
+        n = 0
+
     if event == 'view':
         
         path = values['input']
         im1 = Image.open(path)
 
-        dir = getDirectory(getCourse(values))
+        dirc = getDirectory(getCourse(values))
         curso = getNameCourse(getCourse(values))
         
         if getPosttype(values) == 1:
-            y = 4186
+            y = stories
             original = (500,500)
             im1 = im1.resize((5001,5001))
 
         if getPosttype(values) == 2:
-            y = 7000
+            y = stories
             original = (501,891)
             im1 = im1.resize((5016,8918))
 
-        directory1 = dir + '1.png'
+        directory1 = dirc + '1.png'
         directory2 = dir_path + '/Centro Sul/View.png'
         im2 = Image.open(directory1)
         copied = im1.copy()
@@ -210,7 +225,6 @@ while True:
         copied.save(directory2 , quality=95)
 
         view(directory2)
-
 
     if event == pg.WINDOW_CLOSED:
         break
